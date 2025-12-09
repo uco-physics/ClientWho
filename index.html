@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クライアント情報検出ツール</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .loading {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>あなたのクライアント情報を検出しました</h1>
+    <div id="loading" class="loading">情報を読み込んでいます...</div>
+    <table id="infoTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>項目</th>
+                <th>値</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- JavaScriptで動的に追加 -->
+        </tbody>
+    </table>
+
+    <script>
+        // クライアント情報を検出する関数
+        function detectClientInfo() {
+            const userAgent = navigator.userAgent;
+            const platform = navigator.platform;
+            const language = navigator.language || navigator.userLanguage;
+            const screenWidth = screen.width;
+            const screenHeight = screen.height;
+            const colorDepth = screen.colorDepth;
+            const pixelDepth = screen.pixelDepth;
+            const timezoneOffset = new Date().getTimezoneOffset();
+            const cookiesEnabled = navigator.cookieEnabled;
+            const doNotTrack = navigator.doNotTrack;
+            const online = navigator.onLine;
+
+            // OSの検出 (簡易版)
+            let os = '不明';
+            if (userAgent.indexOf('Windows') !== -1) {
+                os = 'Windows';
+                if (userAgent.indexOf('Windows NT 10.0') !== -1) os += ' 10/11';
+                else if (userAgent.indexOf('Windows NT 6.1') !== -1) os += ' 7';
+                else if (userAgent.indexOf('Windows NT 6.0') !== -1) os += ' Vista';
+            } else if (userAgent.indexOf('Mac') !== -1) {
+                os = 'macOS';
+            } else if (userAgent.indexOf('Linux') !== -1) {
+                os = 'Linux';
+            } else if (userAgent.indexOf('Android') !== -1) {
+                os = 'Android';
+            } else if (userAgent.indexOf('iPhone') !== -1 || userAgent.indexOf('iPad') !== -1) {
+                os = 'iOS';
+            }
+
+            // ブラウザの検出 (簡易版)
+            let browser = '不明';
+            let version = '不明';
+            if (userAgent.indexOf('Chrome') !== -1) {
+                browser = 'Chrome';
+                const match = userAgent.match(/Chrome\/(\d+)/);
+                version = match ? match[1] : '不明';
+            } else if (userAgent.indexOf('Firefox') !== -1) {
+                browser = 'Firefox';
+                const match = userAgent.match(/Firefox\/(\d+)/);
+                version = match ? match[1] : '不明';
+            } else if (userAgent.indexOf('Safari') !== -1 && userAgent.indexOf('Chrome') === -1) {
+                browser = 'Safari';
+                const match = userAgent.match(/Version\/(\d+)/);
+                version = match ? match[1] : '不明';
+            } else if (userAgent.indexOf('Edge') !== -1) {
+                browser = 'Edge';
+                const match = userAgent.match(/Edge\/(\d+)/);
+                version = match ? match[1] : '不明';
+            } else if (userAgent.indexOf('Trident') !== -1) {
+                browser = 'Internet Explorer';
+                const match = userAgent.match(/rv:(\d+)/);
+                version = match ? match[1] : '不明';
+            }
+
+            // テーブルに情報を追加
+            const tbody = document.querySelector('#infoTable tbody');
+            const info = [
+                { key: 'OS', value: os },
+                { key: 'ブラウザ', value: browser },
+                { key: 'ブラウザバージョン', value: version },
+                { key: 'プラットフォーム', value: platform },
+                { key: '言語', value: language },
+                { key: '画面解像度', value: `${screenWidth} x ${screenHeight}` },
+                { key: '色深度', value: `${colorDepth} ビット` },
+                { key: 'ピクセル深度', value: `${pixelDepth} ビット` },
+                { key: 'タイムゾーンオフセット (分)', value: timezoneOffset },
+                { key: 'Cookie有効', value: cookiesEnabled ? '有効' : '無効' },
+                { key: 'Do Not Track', value: doNotTrack || '未設定' },
+                { key: 'オンライン状態', value: online ? 'オンライン' : 'オフライン' },
+                { key: 'User Agent (全文)', value: userAgent }
+            ];
+
+            info.forEach(item => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = item.key;
+                row.insertCell(1).textContent = item.value;
+            });
+
+            // ローディングを非表示、テーブルを表示
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('infoTable').style.display = 'table';
+        }
+
+        // ページロード時に実行
+        window.addEventListener('load', detectClientInfo);
+    </script>
+</body>
+</html>
